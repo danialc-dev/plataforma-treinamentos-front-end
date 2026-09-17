@@ -6,6 +6,8 @@ import Relatorios from './pages/admin/relatorios.jsx'
 import Relatorio from './pages/admin/relatorio.jsx'
 import Treinamentos from './pages/admin/treinamentos.jsx'
 import Colaboradores from './pages/admin/colaboradores.jsx'
+import PainelColaborador from './components/colaborador/PainelColaborador.jsx'
+import InicioColaborador from './pages/colaborador/inicio.jsx'
 
 function App() {
   return (
@@ -18,6 +20,12 @@ function App() {
           <Route path="relatorios" element={<Relatorios />} />
           <Route path="relatorios/:tipo" element={<Relatorio />} />
           <Route path="colaboradores" element={<Colaboradores />} />
+        </Route>
+        <Route path="/colaborador" element={<PainelColaborador />}>
+          <Route index element={<InicioColaborador />} />
+          <Route path="treinamentos" element={<InicioColaborador />} />
+          <Route path="progresso" element={<InicioColaborador />} />
+          <Route path="treinamentos/:id" element={<InicioColaborador />} />
         </Route>
       </Routes>
     </BrowserRouter>
