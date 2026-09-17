@@ -1,0 +1,27 @@
+.welcome {
+  width: min(100% - 2rem, 44rem);
+  margin: auto;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+  color: #52606d;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  color: #1f2933;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.1;
+}
+
+.description {
+  margin-top: 1.25rem;
+  color: #52606d;
+}
