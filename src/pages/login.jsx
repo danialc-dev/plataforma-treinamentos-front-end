@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -7,6 +8,7 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PainelLogin from '../components/PainelLogin';
+import { login } from '../services/api';
 
 function formatarCpf(valor) {
   return valor
@@ -22,9 +24,28 @@ function Login() {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [manterConectado, setManterConectado] = useState(false);
+  const [erro, setErro] = useState('');
+  const [enviando, setEnviando] = useState(false);
+  const navigate = useNavigate();
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setErro('');
+    setEnviando(true);
+    try {
+      const resposta = await login(cpf, senha, perfil);
+      const esperadoAdmin = perfil === 'administrador';
+      if (esperadoAdmin && !resposta.identity.isAdmin) {
+        throw new Error('Este CPF não possui acesso de administrador.');
+      }
+      localStorage.setItem('token', resposta.token);
+      localStorage.setItem('identity', JSON.stringify(resposta.identity));
+      navigate(esperadoAdmin ? '/admin' : '/colaborador');
+    } catch (error) {
+      setErro(error.message);
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -107,8 +128,9 @@ function Login() {
             </Box>
 
             <Button type="submit" variant="contained" fullWidth sx={{ height: 40 }}>
-              Entrar
+              {enviando ? 'Entrando...' : 'Entrar'}
             </Button>
+            {erro && <Typography role="alert" sx={{ color: '#b42318', fontSize: 13, mt: 1.5 }}>{erro}</Typography>}
           </Box>
         </Box>
       </Box>

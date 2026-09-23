@@ -18,6 +18,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@rolldown/binding-win32-x64-msvc": "^1.2.10",
     "@vitejs/plugin-react": "^6.1.1",
     "vite": "^8.3.0"
   }

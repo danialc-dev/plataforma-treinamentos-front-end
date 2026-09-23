@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -12,13 +13,7 @@ import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
-import {
-  colaborador,
-  resumoColaborador,
-  treinamentosAtencao,
-  treinamentosBloqueados,
-  treinamentosEmAndamento,
-} from '../../data/colaborador';
+import { dashboardColaborador } from '../../services/api';
 
 const cartoesResumo = [
   { chave: 'pendentes', texto: 'A fazer', Icone: SchoolOutlinedIcon, cor: '#1e5139', fundo: '#eaf6ef' },
@@ -27,7 +22,7 @@ const cartoesResumo = [
   { chave: 'atrasados', texto: 'Atrasados', Icone: WarningAmberRoundedIcon, cor: '#b42318', fundo: '#fdeceb' },
 ];
 
-function CartaoResumo({ chave, texto, Icone, cor, fundo }) {
+function CartaoResumo({ valor, texto, Icone, cor, fundo }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: 'white', borderRadius: '12px', p: 2.25, boxShadow: '0 1px 2px rgba(17, 47, 33, 0.06)' }}>
       <Box sx={{ width: 40, height: 40, borderRadius: '10px', bgcolor: fundo, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -35,7 +30,7 @@ function CartaoResumo({ chave, texto, Icone, cor, fundo }) {
       </Box>
       <Box>
         <Typography sx={{ fontSize: 22, fontWeight: 700, color: '#1f2937', lineHeight: 1.15 }}>
-          {resumoColaborador[chave]}
+          {valor}
         </Typography>
         <Typography sx={{ fontSize: 12, color: '#6b7280' }}>{texto}</Typography>
       </Box>
@@ -110,6 +105,32 @@ function CardAndamento({ treinamento }) {
 }
 
 function InicioColaborador() {
+  const [dashboard, setDashboard] = useState(null);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    dashboardColaborador().then(setDashboard).catch((error) => setErro(error.message));
+  }, []);
+
+  if (erro) return <Typography role="alert" color="error">{erro}</Typography>;
+  if (!dashboard) return <Typography>Carregando painel...</Typography>;
+
+  const { identity, summary, percentualConcluido } = dashboard;
+  const colaborador = { nome: identity.nome };
+  const resumoColaborador = {
+    percentual: percentualConcluido,
+    pendentes: summary.aFazer,
+    emAndamento: summary.emAndamento,
+    concluidos: summary.concluidos,
+    atrasados: summary.atrasados,
+  };
+  const treinamentosAtencao = dashboard.attention.map((item) => ({
+    ...item,
+    prazo: item.tipo === 'atrasado' ? `Atrasado há ${item.dias} dias` : `Vence em ${item.dias} dias`,
+    acao: item.status === 'em_andamento' ? 'Continuar' : 'Iniciar',
+  }));
+  const treinamentosEmAndamento = dashboard.emAndamento.map((item) => ({ ...item, percentual: 0, etapa: 'Em andamento', acao: 'Continuar' }));
+  const treinamentosBloqueados = dashboard.bloqueados || [];
   return (
     <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
       <Box sx={{ mb: 3 }}>
@@ -137,7 +158,7 @@ function InicioColaborador() {
       </Box>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' }, gap: 1.5, mb: 3.5 }}>
-        {cartoesResumo.map((cartao) => <CartaoResumo key={cartao.chave} {...cartao} />)}
+        {cartoesResumo.map((cartao) => <CartaoResumo key={cartao.chave} {...cartao} valor={resumoColaborador[cartao.chave]} />)}
       </Box>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1.15fr) minmax(360px, 0.85fr)' }, gap: 2.5, mb: 2.5 }}>

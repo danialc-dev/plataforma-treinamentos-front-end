@@ -10,7 +10,7 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import MenuOpenRoundedIcon from '@mui/icons-material/MenuOpenRounded';
 import Avatar from '@mui/material/Avatar';
 import logoStw from '../../assets/logo-stw.png';
-import { colaborador } from '../../data/colaborador';
+import { logout } from '../../services/api';
 
 const itens = [
   { caminho: '/colaborador', texto: 'Início', Icone: HomeRoundedIcon, index: true },
@@ -19,6 +19,8 @@ const itens = [
 ];
 
 function MenuLateralColaborador({ mobile = false, recolhido = false, onClose, onToggle }) {
+  const identity = JSON.parse(localStorage.getItem('identity') || '{}');
+  const colaborador = { nome: identity.nome || 'Colaborador', cpf: identity.cpf || '', perfil: 'Colaborador' };
   const compacto = !mobile && recolhido;
   const iniciais = colaborador.nome
     .split(' ')
@@ -115,6 +117,7 @@ function MenuLateralColaborador({ mobile = false, recolhido = false, onClose, on
         <Box
           component={Link}
           to="/"
+          onClick={() => { logout().catch(() => null); localStorage.removeItem('token'); localStorage.removeItem('identity'); onClose?.(); }}
           sx={{
             display: 'flex',
             alignItems: 'center',

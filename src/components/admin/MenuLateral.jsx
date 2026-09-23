@@ -11,7 +11,7 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import MenuOpenRoundedIcon from '@mui/icons-material/MenuOpenRounded';
 import logoStw from '../../assets/logo-stw.png';
-import { usuarioAdmin } from '../../data/admin';
+import { logout } from '../../services/api';
 
 const itens = [
   { caminho: '/admin', texto: 'Início', Icone: HomeRoundedIcon, index: true },
@@ -21,6 +21,8 @@ const itens = [
 ];
 
 function MenuLateral({ mobile = false, recolhido = false, onClose, onToggle }) {
+  const identity = JSON.parse(localStorage.getItem('identity') || '{}');
+  const usuarioAdmin = { nome: identity.nome || 'Administrador', cpf: identity.cpf || '', perfil: 'Administrador' };
   const compacto = !mobile && recolhido;
   const iniciais = usuarioAdmin.nome.split(' ').filter(Boolean).slice(0, 2).map((nome) => nome[0]).join('');
   return (
@@ -88,7 +90,7 @@ function MenuLateral({ mobile = false, recolhido = false, onClose, onToggle }) {
             <Typography noWrap sx={{ color: '#c9eedd', fontSize: 11 }}>{usuarioAdmin.perfil} · {usuarioAdmin.cpf}</Typography>
           </Box>
         </Box>
-        <Box component={Link} to="/" onClick={onClose} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, justifyContent: compacto ? 'center' : 'flex-start', mx: 0.5, px: compacto ? 0 : 1.5, py: 1.25, borderRadius: '8px', color: 'white', fontSize: 14, textDecoration: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
+        <Box component={Link} to="/" onClick={() => { logout().catch(() => null); localStorage.removeItem('token'); localStorage.removeItem('identity'); onClose?.(); }} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, justifyContent: compacto ? 'center' : 'flex-start', mx: 0.5, px: compacto ? 0 : 1.5, py: 1.25, borderRadius: '8px', color: 'white', fontSize: 14, textDecoration: 'none', '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' } }}>
           <LogoutOutlinedIcon fontSize="small" />
           <Typography className="admin-sidebar-label" sx={{ display: compacto ? 'none' : 'block', fontSize: 'inherit', color: 'inherit', whiteSpace: 'nowrap' }}>Sair</Typography>
         </Box>
