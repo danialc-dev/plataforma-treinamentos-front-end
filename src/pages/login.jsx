@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import PainelLogin from '../components/PainelLogin';
@@ -28,8 +27,17 @@ function Login() {
   const [enviando, setEnviando] = useState(false);
   const navigate = useNavigate();
 
+  function trocarPerfil(novoPerfil) {
+    if (novoPerfil === perfil || enviando) return;
+    setPerfil(novoPerfil);
+    setCpf('');
+    setSenha('');
+    setErro('');
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
+    if (enviando) return;
     setErro('');
     setEnviando(true);
     try {
@@ -60,11 +68,12 @@ function Login() {
                 key={opcao}
                 component="button"
                 type="button"
-                onClick={() => setPerfil(opcao)}
+                onClick={() => trocarPerfil(opcao)}
+                disabled={enviando}
                 sx={{
                   flex: 1,
                   py: 1,
-                  cursor: 'pointer',
+                  cursor: enviando ? 'default' : 'pointer',
                   border: perfil === opcao ? '1px solid #e2efe9' : '1px solid transparent',
                   borderRadius: '6px',
                   bgcolor: perfil === opcao ? 'white' : 'transparent',
@@ -110,7 +119,7 @@ function Login() {
               required
             />
 
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', my: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -122,12 +131,9 @@ function Login() {
                 label="Manter conectado"
                 sx={{ m: 0, '& .MuiFormControlLabel-label': { fontSize: 14, color: 'text.secondary' } }}
               />
-              <Link component="button" type="button" underline="none" sx={{ fontSize: 14, fontWeight: 600 }}>
-                Esqueci minha senha
-              </Link>
             </Box>
 
-            <Button type="submit" variant="contained" fullWidth sx={{ height: 40 }}>
+            <Button type="submit" variant="contained" fullWidth disabled={enviando} sx={{ height: 40 }}>
               {enviando ? 'Entrando...' : 'Entrar'}
             </Button>
             {erro && <Typography role="alert" sx={{ color: '#b42318', fontSize: 13, mt: 1.5 }}>{erro}</Typography>}
