@@ -32,9 +32,6 @@ function AreaTreinamentos() {
   return (
     <ContextoTreinamentos.Provider value={{ treinamentos, dispatch, concluir }}>
       <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
-        <Alert severity="info" sx={{ mb: 3, fontSize: 13 }}>
-          Demonstração com dados e vídeo de exemplo. As conclusões não são salvas no servidor. Sair desta área ou recarregar a página restaura os exemplos.
-        </Alert>
         <Outlet />
       </Box>
       <Snackbar open={Boolean(mensagem)} autoHideDuration={6000} onClose={fecharMensagem}>

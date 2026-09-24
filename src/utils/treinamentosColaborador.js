@@ -18,7 +18,7 @@ export function atualizarTreinamentos(treinamentos, acao) {
   if (acao.tipo === 'iniciar') alteracao = { status: 'em_andamento' };
   if (acao.tipo === 'videoFinalizado') alteracao = { status: 'em_andamento', videoFinalizado: true };
   if (acao.tipo === 'concluir' && !erroConclusao(treinamento, treinamentos, acao.aceitou)) {
-    alteracao = { status: 'concluido', concluidoEm: acao.data };
+    alteracao = { status: 'concluido', percentual: 100, etapa: 'Concluído', concluidoEm: acao.data };
   }
   if (!alteracao) return treinamentos;
   return treinamentos.map((item) => item.id === acao.id ? { ...item, ...alteracao } : item);

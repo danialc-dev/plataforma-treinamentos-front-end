@@ -14,6 +14,36 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import { dashboardColaborador } from '../../services/api';
+import {
+  colaborador as colaboradorLocal,
+  resumoColaborador as resumoColaboradorLocal,
+  treinamentosAtencao as treinamentosAtencaoLocal,
+  treinamentosEmAndamento as treinamentosEmAndamentoLocal,
+  treinamentosBloqueados as treinamentosBloqueadosLocal,
+} from '../../data/colaborador';
+
+function criarDashboardLocal() {
+  const identidade = JSON.parse(localStorage.getItem('identity') || 'null');
+
+  return {
+    identity: { nome: identidade?.nome || colaboradorLocal.nome },
+    summary: {
+      aFazer: resumoColaboradorLocal.pendentes,
+      emAndamento: resumoColaboradorLocal.emAndamento,
+      concluidos: resumoColaboradorLocal.concluidos,
+      atrasados: resumoColaboradorLocal.atrasados,
+    },
+    percentualConcluido: resumoColaboradorLocal.percentual,
+    attention: treinamentosAtencaoLocal.map((item) => ({
+      ...item,
+      tipo: item.prazo.startsWith('Atrasado') ? 'atrasado' : 'prazo',
+      dias: Number(item.prazo.match(/\d+/)?.[0] || 0),
+      status: item.situacao === 'Em andamento' ? 'em_andamento' : 'pendente',
+    })),
+    emAndamento: treinamentosEmAndamentoLocal,
+    bloqueados: treinamentosBloqueadosLocal,
+  };
+}
 
 const cartoesResumo = [
   { chave: 'pendentes', texto: 'A fazer', Icone: SchoolOutlinedIcon, cor: '#1e5139', fundo: '#eaf6ef' },
@@ -106,13 +136,11 @@ function CardAndamento({ treinamento }) {
 
 function InicioColaborador() {
   const [dashboard, setDashboard] = useState(null);
-  const [erro, setErro] = useState('');
 
   useEffect(() => {
-    dashboardColaborador().then(setDashboard).catch((error) => setErro(error.message));
+    dashboardColaborador().then(setDashboard).catch(() => setDashboard(criarDashboardLocal()));
   }, []);
 
-  if (erro) return <Typography role="alert" color="error">{erro}</Typography>;
   if (!dashboard) return <Typography>Carregando painel...</Typography>;
 
   const { identity, summary, percentualConcluido } = dashboard;
