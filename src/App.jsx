@@ -8,6 +8,9 @@ import Treinamentos from './pages/admin/treinamentos.jsx'
 import Colaboradores from './pages/admin/colaboradores.jsx'
 import PainelColaborador from './components/colaborador/PainelColaborador.jsx'
 import InicioColaborador from './pages/colaborador/inicio.jsx'
+import AreaTreinamentos from './components/colaborador/AreaTreinamentos.jsx'
+import TreinamentosColaborador from './pages/colaborador/treinamentos.jsx'
+import TreinamentoColaborador from './pages/colaborador/treinamento.jsx'
 
 function ProtectedRoute({ adminOnly = false, children }) {
   const identity = JSON.parse(localStorage.getItem('identity') || 'null')
@@ -32,9 +35,11 @@ function App() {
         </Route>
         <Route path="/colaborador" element={<ProtectedRoute><PainelColaborador /></ProtectedRoute>}>
           <Route index element={<InicioColaborador />} />
-          <Route path="treinamentos" element={<InicioColaborador />} />
           <Route path="progresso" element={<InicioColaborador />} />
-          <Route path="treinamentos/:id" element={<InicioColaborador />} />
+          <Route element={<AreaTreinamentos />}>
+            <Route path="treinamentos" element={<TreinamentosColaborador />} />
+            <Route path="treinamentos/:id" element={<TreinamentoColaborador />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
