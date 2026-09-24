@@ -35,9 +35,9 @@ function App() {
           <Route path="colaboradores" element={<Colaboradores />} />
         </Route>
         <Route path="/colaborador" element={<ProtectedRoute><PainelColaborador /></ProtectedRoute>}>
-          <Route index element={<InicioColaborador />} />
-          <Route path="progresso" element={<ProgressoColaborador />} />
           <Route element={<AreaTreinamentos />}>
+            <Route index element={<InicioColaborador />} />
+            <Route path="progresso" element={<ProgressoColaborador />} />
             <Route path="treinamentos" element={<TreinamentosColaborador />} />
             <Route path="treinamentos/:id" element={<TreinamentoColaborador />} />
           </Route>
