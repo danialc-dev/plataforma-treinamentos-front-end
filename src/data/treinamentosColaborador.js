@@ -9,10 +9,10 @@ export function criarTreinamentosColaborador(hoje = new Date()) {
   }
 
   return [
-    { id: '1', titulo: 'NR-35 - Trabalho em Altura', obrigatorio: true, prazo: data(3), status: 'em_andamento', videoId, preRequisitoId: null },
-    { id: '2', titulo: 'Uso de EPI', obrigatorio: true, prazo: data(-2), status: 'pendente', videoId, preRequisitoId: null },
-    { id: '3', titulo: 'Integração de Novos Colaboradores', obrigatorio: true, prazo: data(7), status: 'concluido', concluidoEm: `${data(-1)}T12:00:00`, videoId, preRequisitoId: null },
-    { id: '4', titulo: 'Ergonomia no ambiente de trabalho', obrigatorio: false, prazo: data(15), status: 'pendente', videoId, preRequisitoId: null },
-    { id: '5', titulo: 'Trabalho com Produtos Químicos', obrigatorio: true, prazo: data(30), status: 'pendente', videoId, preRequisitoId: '2' },
+    { id: '1', titulo: 'NR-35 - Trabalho em Altura', descricao: 'Aprenda os principais cuidados e procedimentos para realizar atividades em altura com segurança.', objetivo: 'Reconhecer riscos e aplicar medidas preventivas durante o trabalho em altura.', ca: 'CA 12345', duracao: '12 minutos', obrigatorio: true, prazo: data(3), status: 'em_andamento', videoId, preRequisitoId: null },
+    { id: '2', titulo: 'Uso de EPI', descricao: 'Conheça a forma correta de selecionar, utilizar, higienizar e armazenar os equipamentos de proteção individual.', objetivo: 'Utilizar os EPIs de forma correta e segura durante as atividades profissionais.', ca: 'CA 67890', duracao: '10 minutos', obrigatorio: true, prazo: data(-2), status: 'pendente', videoId, preRequisitoId: null },
+    { id: '3', titulo: 'Integração de Novos Colaboradores', descricao: 'Apresentação da empresa, das regras de convivência e dos principais procedimentos internos.', objetivo: 'Conhecer a empresa e os procedimentos essenciais para iniciar as atividades.', ca: 'Não se aplica', duracao: '15 minutos', obrigatorio: true, prazo: data(7), status: 'concluido', concluidoEm: `${data(-1)}T12:00:00`, videoId, preRequisitoId: null },
+    { id: '4', titulo: 'Ergonomia no ambiente de trabalho', descricao: 'Orientações para ajustar o posto de trabalho e prevenir desconfortos e lesões.', objetivo: 'Adotar hábitos e ajustes ergonômicos na rotina de trabalho.', ca: 'Não se aplica', duracao: '8 minutos', obrigatorio: false, prazo: data(15), status: 'pendente', videoId, preRequisitoId: null },
+    { id: '5', titulo: 'Trabalho com Produtos Químicos', descricao: 'Boas práticas para manuseio, armazenamento e resposta a incidentes com produtos químicos.', objetivo: 'Identificar perigos e aplicar procedimentos seguros no contato com produtos químicos.', ca: 'CA 24680', duracao: '14 minutos', obrigatorio: true, prazo: data(30), status: 'pendente', videoId, preRequisitoId: '2' },
   ];
 }
