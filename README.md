@@ -72,25 +72,27 @@ npm run build
 
 Configure `VITE_API_URL` para definir a URL base da API Laravel. Consulte `.env.example`.
 
-## Modais de gestão de treinamentos
+## Gestão de treinamentos (admin)
 
-A rota autenticada `/admin/treinamentos` permite criar, editar e inativar treinamentos usando dados de exemplo. As alterações existem somente enquanto a página está montada: sair dela ou recarregar restaura os quatro exemplos originais. Nenhuma operação desses modais chama a API ou altera o dashboard do servidor.
+A rota autenticada `/admin/treinamentos` está ligada à API Laravel: lista, cria, edita e inativa treinamentos pelos endpoints `GET/POST /treinamentos`, `PATCH /treinamentos/{id}` e `DELETE /treinamentos/{id}` (veja `docs/API.md` no repositório do back-end). Depois de cada alteração a lista é recarregada do servidor. É preciso estar com a API no ar e usar um usuário administrador.
+
+A tela trabalha com `nome`, `obrigatorio`, `prazoDias` e `preRequisitoId`; a API usa `titulo`, `categoria`, `prazo_dias` e `prerequisito_id`. A conversão fica em `src/utils/treinamentosApi.js`. Obrigatório é guardado em `categoria` (`obrigatório` / `não obrigatório`) e o `tipo` enviado na criação é sempre `online` (na edição o tipo não é alterado).
 
 O formulário compartilha os campos nome, obrigatoriedade, prazo em dias e um pré-requisito opcional. O status inicial é ativo; a confirmação de inativação preserva o registro e permite continuar editando suas informações.
 
-Regras provisórias para validar com o time/backend:
+Regras de pré-requisito e inativação, validadas no front para dar retorno imediato e **também no back-end**, que é quem decide:
 
 - Prazo é um inteiro positivo. O marco inicial da contagem ainda será definido.
 - Um único pré-requisito ativo por treinamento, sem dependência de si mesmo ou ciclos.
 - Inativação bloqueada enquanto houver outro treinamento ativo que exija este.
 - Não há reativação, exclusão definitiva, upload, aulas ou avaliações nesta entrega.
-- Os três indicadores contam somente os registros ativos da lista local.
+- Os três indicadores contam somente os registros ativos da lista carregada.
 
-Os componentes `ModalTreinamento` e `ModalInativarTreinamento` aceitam callbacks assíncronos: mantêm o diálogo aberto em caso de erro e bloqueiam envio duplicado. Para integrar, substituir a fonte local e os callbacks da página pelas operações reais, respeitando os endpoints, identificadores e payloads definidos pelo backend.
+Os componentes `ModalTreinamento` e `ModalInativarTreinamento` aceitam callbacks assíncronos: mantêm o diálogo aberto em caso de erro (exibindo a mensagem devolvida pela API) e bloqueiam envio duplicado.
 
 ### Verificação
 
 ```bash
-node --test src/utils/treinamentos.test.js
+node --test src/utils/*.test.js
 npm run build
 ```

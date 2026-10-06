@@ -14,7 +14,8 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.message || 'Não foi possível concluir a solicitação.');
+    const primeiroErroDeCampo = body.errors && Object.values(body.errors)[0]?.[0];
+    throw new Error(primeiroErroDeCampo || body.message || 'Não foi possível concluir a solicitação.');
   }
 
   return response.status === 204 ? null : response.json();
@@ -25,3 +26,7 @@ export const login = (cpf, senha, perfil) => request('/login', { method: 'POST',
 export const dashboardAdmin = () => request('/dashboard/admin');
 export const dashboardColaborador = () => request('/dashboard/colaborador');
 export const logout = () => request('/logout', { method: 'POST' });
+export const listarTreinamentos = () => request('/treinamentos');
+export const criarTreinamento = (dados) => request('/treinamentos', { method: 'POST', body: JSON.stringify(dados) });
+export const atualizarTreinamento = (id, dados) => request(`/treinamentos/${id}`, { method: 'PATCH', body: JSON.stringify(dados) });
+export const inativarTreinamento = (id) => request(`/treinamentos/${id}`, { method: 'DELETE' });
