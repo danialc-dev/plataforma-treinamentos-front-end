@@ -90,6 +90,10 @@ Regras de pré-requisito e inativação, validadas no front para dar retorno ime
 
 Os componentes `ModalTreinamento` e `ModalInativarTreinamento` aceitam callbacks assíncronos: mantêm o diálogo aberto em caso de erro (exibindo a mensagem devolvida pela API) e bloqueiam envio duplicado.
 
+## Sessão expirada
+
+Se a API responder `401` a uma requisição feita com token (expirado, revogado ou inválido), `src/services/api.js` apaga `token` e `identity` do `localStorage` e redireciona para o login.
+
 ### Verificação
 
 ```bash

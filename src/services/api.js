@@ -13,6 +13,12 @@ async function request(path, options = {}) {
   });
 
   if (!response.ok) {
+    // Token ausente, expirado ou revogado: encerra a sessão local e volta ao login.
+    if (response.status === 401 && token) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('identity');
+      window.location.assign('/');
+    }
     const body = await response.json().catch(() => ({}));
     const primeiroErroDeCampo = body.errors && Object.values(body.errors)[0]?.[0];
     throw new Error(primeiroErroDeCampo || body.message || 'Não foi possível concluir a solicitação.');
