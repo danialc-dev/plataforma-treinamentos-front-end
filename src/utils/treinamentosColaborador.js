@@ -11,6 +11,14 @@ export function erroConclusao(treinamento, treinamentos, aceitou) {
 }
 
 export function atualizarTreinamentos(treinamentos, acao) {
+  // Lista nova vinda do servidor. Preserva só o que existe apenas no navegador: o vídeo já assistido.
+  if (acao.tipo === 'carregar') {
+    return acao.treinamentos.map((item) => {
+      const anterior = treinamentos.find((outro) => outro.id === item.id);
+      return anterior?.videoFinalizado && item.status !== 'concluido' ? { ...item, videoFinalizado: true } : item;
+    });
+  }
+
   const treinamento = treinamentos.find((item) => item.id === acao.id);
   if (!treinamento || treinamento.status === 'concluido' || estaBloqueado(treinamento, treinamentos)) return treinamentos;
 
@@ -32,9 +40,10 @@ export function situacaoTreinamento(treinamento, treinamentos) {
 }
 
 export function formatarDataTreinamento(valor) {
+  if (!valor) return 'Sem prazo';
   return new Date(valor.length === 10 ? `${valor}T12:00:00` : valor).toLocaleDateString('pt-BR');
 }
 
 export function prazoVencido(treinamento, hoje = new Date()) {
-  return treinamento.status !== 'concluido' && new Date(`${treinamento.prazo}T23:59:59.999`) < hoje;
+  return Boolean(treinamento.prazo) && treinamento.status !== 'concluido' && new Date(`${treinamento.prazo}T23:59:59.999`) < hoje;
 }

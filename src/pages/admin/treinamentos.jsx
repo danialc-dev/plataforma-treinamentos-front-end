@@ -9,19 +9,20 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import PowerSettingsNewRoundedIcon from '@mui/icons-material/PowerSettingsNewRounded';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { CartaoResumo, CabecalhoPagina, EtiquetaStatus, containerCard } from '../../components/admin/ElementosAdmin';
 import ModalTreinamento from '../../components/admin/ModalTreinamento';
 import ModalInativarTreinamento from '../../components/admin/ModalInativarTreinamento';
 import { atualizarTreinamento, criarTreinamento, inativarTreinamento as inativarTreinamentoApi, listarTreinamentos } from '../../services/api';
-import { obterDependentesAtivos, validarTreinamento } from '../../utils/treinamentos';
+import { obterDependentesAtivos, obterPrerequisitoInativo, TIPOS_TREINAMENTO, validarTreinamento } from '../../utils/treinamentos';
 import { treinamentoDaApi, treinamentoParaApi } from '../../utils/treinamentosApi';
 
 function Treinamentos() {
   const [treinamentos, setTreinamentos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarga, setErroCarga] = useState('');
+  const [ativandoId, setAtivandoId] = useState(null);
   const [modal, setModal] = useState(null);
   const [notificacao, setNotificacao] = useState(null);
   const selecionado = treinamentos.find((item) => item.id === modal?.id);
@@ -43,8 +44,8 @@ function Treinamentos() {
 
   useEffect(() => { carregar(); }, [carregar]);
 
-  function notificar(mensagem) {
-    setNotificacao({ mensagem, id: crypto.randomUUID() });
+  function notificar(mensagem, severidade = 'success') {
+    setNotificacao({ mensagem, severidade, id: crypto.randomUUID() });
   }
 
   async function salvarTreinamento(valores) {
@@ -53,10 +54,10 @@ function Treinamentos() {
 
     if (modal.tipo === 'editar') {
       if (!selecionado) throw new Error('Treinamento não encontrado. Reabra o formulário.');
-      await atualizarTreinamento(selecionado.id, treinamentoParaApi(valores, { criando: false }));
+      await atualizarTreinamento(selecionado.id, treinamentoParaApi(valores));
       notificar('Treinamento atualizado.');
     } else {
-      await criarTreinamento(treinamentoParaApi(valores, { criando: true }));
+      await criarTreinamento(treinamentoParaApi(valores));
       notificar('Treinamento criado.');
     }
     await carregar();
@@ -69,6 +70,24 @@ function Treinamentos() {
     await inativarTreinamentoApi(id);
     notificar('Treinamento inativado.');
     await carregar();
+  }
+
+  async function ativarTreinamento(treinamento) {
+    const requisito = obterPrerequisitoInativo(treinamentos, treinamento);
+    if (requisito) {
+      notificar(`Ative o pré-requisito "${requisito.nome}" antes de ativar este treinamento.`, 'error');
+      return;
+    }
+    setAtivandoId(treinamento.id);
+    try {
+      await atualizarTreinamento(treinamento.id, { ativo: true });
+      notificar('Treinamento ativado.');
+      await carregar();
+    } catch (error) {
+      notificar(error.message, 'error');
+    } finally {
+      setAtivandoId(null);
+    }
   }
 
   function fecharNotificacao(_, motivo) {
@@ -98,6 +117,7 @@ function Treinamentos() {
               <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#1f2937', mb: 0.75, overflowWrap: 'anywhere' }}>{treinamento.nome}</Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                 <EtiquetaStatus label={treinamento.obrigatorio ? 'Obrigatório' : 'Não obrigatório'} tipo={treinamento.obrigatorio ? 'warning' : 'neutral'} />
+                <EtiquetaStatus label={TIPOS_TREINAMENTO[treinamento.tipo] ?? treinamento.tipo} tipo="neutral" />
                 {treinamento.prazoDias != null && <Typography sx={{ fontSize: 12, color: '#6b7280' }}>Prazo: {treinamento.prazoDias} {treinamento.prazoDias === 1 ? 'dia' : 'dias'}</Typography>}
               </Box>
               {treinamento.preRequisitoId && <Typography sx={{ mt: 0.75, fontSize: 12, color: '#6b7280', overflowWrap: 'anywhere' }}>Pré-requisito: {nomesPorId.get(treinamento.preRequisitoId)}</Typography>}
@@ -105,7 +125,7 @@ function Treinamentos() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <EtiquetaStatus label={treinamento.ativo ? 'Ativo' : 'Inativo'} tipo={treinamento.ativo ? 'success' : 'neutral'} />
               <Tooltip title="Editar treinamento"><IconButton onClick={() => setModal({ tipo: 'editar', id: treinamento.id })} aria-label={`Editar ${treinamento.nome}`} sx={{ width: 40, height: 40 }}><EditOutlinedIcon fontSize="small" sx={{ color: '#6b7280' }} /></IconButton></Tooltip>
-              <Tooltip title={treinamento.ativo ? 'Inativar treinamento' : 'Treinamento já inativo'}><span><IconButton onClick={() => setModal({ tipo: 'inativar', id: treinamento.id })} disabled={!treinamento.ativo} aria-label={`Inativar ${treinamento.nome}`} sx={{ width: 40, height: 40 }}><DeleteOutlineRoundedIcon fontSize="small" /></IconButton></span></Tooltip>
+              <Tooltip title={treinamento.ativo ? 'Inativar treinamento' : 'Ativar treinamento'}><span><IconButton onClick={() => (treinamento.ativo ? setModal({ tipo: 'inativar', id: treinamento.id }) : ativarTreinamento(treinamento))} disabled={ativandoId === treinamento.id} aria-label={`${treinamento.ativo ? 'Inativar' : 'Ativar'} ${treinamento.nome}`} sx={{ width: 40, height: 40 }}><PowerSettingsNewRoundedIcon fontSize="small" sx={{ color: treinamento.ativo ? '#b42318' : '#2f855a' }} /></IconButton></span></Tooltip>
             </Box>
           </Box>
         ))}
@@ -113,7 +133,7 @@ function Treinamentos() {
 
       {(modal?.tipo === 'criar' || modal?.tipo === 'editar') && <ModalTreinamento treinamento={selecionado} treinamentos={treinamentos} onClose={() => setModal(null)} onSalvar={salvarTreinamento} />}
       {modal?.tipo === 'inativar' && selecionado && <ModalInativarTreinamento treinamento={selecionado} dependentes={obterDependentesAtivos(treinamentos, selecionado.id)} onClose={() => setModal(null)} onConfirmar={inativarTreinamento} />}
-      <Snackbar key={notificacao?.id} open={Boolean(notificacao)} autoHideDuration={5000} onClose={fecharNotificacao}><Alert onClose={fecharNotificacao} severity="success" variant="filled" sx={{ width: '100%' }}>{notificacao?.mensagem}</Alert></Snackbar>
+      <Snackbar key={notificacao?.id} open={Boolean(notificacao)} autoHideDuration={5000} onClose={fecharNotificacao}><Alert onClose={fecharNotificacao} severity={notificacao?.severidade ?? 'success'} variant="filled" sx={{ width: '100%' }}>{notificacao?.mensagem}</Alert></Snackbar>
     </Box>
   );
 }
