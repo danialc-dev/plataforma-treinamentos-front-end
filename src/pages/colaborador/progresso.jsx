@@ -7,7 +7,7 @@ import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
 import { CartaoResumo, CabecalhoPagina, EtiquetaStatus, containerCard } from '../../components/admin/ElementosAdmin';
-import { useTreinamentosColaborador } from '../../components/colaborador/AreaTreinamentos';
+import { AguardarTreinamentos, useTreinamentosColaborador } from '../../components/colaborador/AreaTreinamentos';
 import { estaBloqueado, situacaoTreinamento } from '../../utils/treinamentosColaborador';
 
 function ProgressoColaborador() {
@@ -27,6 +27,7 @@ function ProgressoColaborador() {
   ];
 
   return (
+    <AguardarTreinamentos>
     <Box sx={{ maxWidth: 1280, mx: 'auto' }}>
       <CabecalhoPagina titulo="Meu progresso" descricao="Acompanhe sua evolução nos treinamentos atribuídos." />
 
@@ -84,6 +85,7 @@ function ProgressoColaborador() {
         })}
       </Box>
     </Box>
+    </AguardarTreinamentos>
   );
 }
 

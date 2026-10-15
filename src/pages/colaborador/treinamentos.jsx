@@ -6,7 +6,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { CabecalhoPagina, EtiquetaStatus, containerCard } from '../../components/admin/ElementosAdmin';
-import { useTreinamentosColaborador } from '../../components/colaborador/AreaTreinamentos';
+import { AguardarTreinamentos, useTreinamentosColaborador } from '../../components/colaborador/AreaTreinamentos';
 import { estaBloqueado, formatarDataTreinamento, prazoVencido, situacaoTreinamento } from '../../utils/treinamentosColaborador';
 
 const colunas = { xs: '1fr', md: 'minmax(0, 2fr) minmax(110px, 0.8fr) minmax(120px, 0.8fr) 140px' };
@@ -16,7 +16,7 @@ function TreinamentosColaborador() {
   const concluidos = treinamentos.filter((item) => item.status === 'concluido').length;
 
   return (
-    <>
+    <AguardarTreinamentos>
       <CabecalhoPagina titulo="Meus treinamentos" descricao={`${treinamentos.length} treinamentos na lista · ${concluidos} ${concluidos === 1 ? 'concluído' : 'concluídos'}`} />
       <Box sx={{ ...containerCard, overflow: 'hidden' }}>
         <Box sx={{ px: 2.5, py: 2.5 }}>
@@ -63,7 +63,7 @@ function TreinamentosColaborador() {
         </Box>
         {!treinamentos.length && <Typography sx={{ p: 3, color: '#6b7280' }}>Você ainda não possui treinamentos atribuídos.</Typography>}
       </Box>
-    </>
+    </AguardarTreinamentos>
   );
 }
 
