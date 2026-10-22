@@ -12,11 +12,12 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { criaCiclo, validarTreinamento } from '../../utils/treinamentos';
+import SecaoGrupos from './SecaoGrupos';
 
 function ModalTreinamento({ treinamento, treinamentos, onClose, onSalvar }) {
   const id = useId();
   const editando = Boolean(treinamento);
-  const [valores, setValores] = useState({ nome: treinamento?.nome ?? '', descricao: treinamento?.descricao ?? '', tipo: treinamento?.tipo ?? 'online', videoUrl: treinamento?.videoUrl ?? '', obrigatorio: treinamento?.obrigatorio ?? true, prazoDias: treinamento?.prazoDias ?? '', preRequisitoId: treinamento?.preRequisitoId ?? '' });
+  const [valores, setValores] = useState({ nome: treinamento?.nome ?? '', descricao: treinamento?.descricao ?? '', tipo: treinamento?.tipo ?? 'online', videoUrl: treinamento?.videoUrl ?? '', obrigatorio: treinamento?.obrigatorio ?? true, prazoDias: treinamento?.prazoDias ?? '', preRequisitoId: treinamento?.preRequisitoId ?? '', grupoIds: treinamento?.grupoIds ?? [] });
   const [erros, setErros] = useState({});
   const [erroEnvio, setErroEnvio] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -48,14 +49,14 @@ function ModalTreinamento({ treinamento, treinamentos, onClose, onSalvar }) {
     setEnviando(true);
     setErroEnvio('');
     try {
-      await onSalvar({ nome: valores.nome.trim(), descricao: valores.descricao.trim(), tipo: valores.tipo, videoUrl: valores.videoUrl.trim(), obrigatorio: valores.obrigatorio, prazoDias: Number(valores.prazoDias), preRequisitoId: valores.preRequisitoId || null });
+      await onSalvar({ nome: valores.nome.trim(), descricao: valores.descricao.trim(), tipo: valores.tipo, videoUrl: valores.videoUrl.trim(), obrigatorio: valores.obrigatorio, prazoDias: Number(valores.prazoDias), preRequisitoId: valores.preRequisitoId || null, grupoIds: valores.grupoIds });
       onClose();
     } catch (error) { setErroEnvio(error.message || 'Não foi possível salvar. Tente novamente.'); }
     finally { envioEmCurso.current = false; setEnviando(false); }
   }
 
   return (
-    <Dialog open onClose={fechar} fullWidth maxWidth="sm" aria-labelledby={`${id}-titulo`} aria-describedby={`${id}-descricao`} slotProps={{ paper: { component: 'form', onSubmit: salvar, noValidate: true, sx: { borderRadius: '16px', m: { xs: 2, sm: 4 }, width: { xs: 'calc(100% - 32px)', sm: '100%' } } } }}>
+    <Dialog open onClose={fechar} fullWidth maxWidth="md" aria-labelledby={`${id}-titulo`} aria-describedby={`${id}-descricao`} slotProps={{ paper: { component: 'form', onSubmit: salvar, noValidate: true, sx: { borderRadius: '16px', m: { xs: 2, sm: 4 }, width: { xs: 'calc(100% - 32px)', sm: '100%' } } } }}>
       <DialogTitle id={`${id}-titulo`} sx={{ pr: 7, fontSize: 22, fontWeight: 700 }}>{editando ? 'Editar treinamento' : 'Criar treinamento'}</DialogTitle>
       <IconButton onClick={fechar} disabled={enviando} aria-label="Fechar formulário" sx={{ position: 'absolute', right: 14, top: 14 }}><CloseRoundedIcon /></IconButton>
       <DialogContent sx={{ pb: 3 }}>
@@ -78,6 +79,7 @@ function ModalTreinamento({ treinamento, treinamentos, onClose, onSalvar }) {
             {valores.preRequisitoId && !opcoes.some((item) => item.id === valores.preRequisitoId) && <MenuItem value={valores.preRequisitoId} disabled>Pré-requisito indisponível — selecione outro</MenuItem>}
             {opcoes.map((item) => <MenuItem key={item.id} value={item.id} sx={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{item.nome}</MenuItem>)}
           </TextField>
+          <SecaoGrupos selecionados={valores.grupoIds} onAlterar={(grupoIds) => alterar('grupoIds', grupoIds)} desabilitado={enviando} />
           {erroEnvio && <Alert severity="error">{erroEnvio}</Alert>}
         </Box>
       </DialogContent>

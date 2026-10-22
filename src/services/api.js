@@ -36,6 +36,7 @@ export const listarTreinamentos = () => request('/treinamentos');
 export const criarTreinamento = (dados) => request('/treinamentos', { method: 'POST', body: JSON.stringify(dados) });
 export const atualizarTreinamento = (id, dados) => request(`/treinamentos/${id}`, { method: 'PATCH', body: JSON.stringify(dados) });
 export const inativarTreinamento = (id) => request(`/treinamentos/${id}`, { method: 'DELETE' });
+export const listarGrupos = () => request('/grupos');
 export const listarMeusTreinamentos = () => request('/meus-treinamentos');
 export const iniciarMeuTreinamento = (id) => request(`/meus-treinamentos/${id}/iniciar`, { method: 'POST' });
 export const concluirMeuTreinamento = (id) => request(`/meus-treinamentos/${id}/concluir`, { method: 'POST', body: JSON.stringify({ termos_aceitos: true }) });

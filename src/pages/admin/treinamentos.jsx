@@ -54,7 +54,7 @@ function Treinamentos() {
 
     if (modal.tipo === 'editar') {
       if (!selecionado) throw new Error('Treinamento não encontrado. Reabra o formulário.');
-      await atualizarTreinamento(selecionado.id, treinamentoParaApi(valores));
+      await atualizarTreinamento(selecionado.id, treinamentoParaApi(valores, selecionado.grupoIds));
       notificar('Treinamento atualizado.');
     } else {
       await criarTreinamento(treinamentoParaApi(valores));
@@ -121,6 +121,7 @@ function Treinamentos() {
                 {treinamento.prazoDias != null && <Typography sx={{ fontSize: 12, color: '#6b7280' }}>Prazo: {treinamento.prazoDias} {treinamento.prazoDias === 1 ? 'dia' : 'dias'}</Typography>}
               </Box>
               {treinamento.preRequisitoId && <Typography sx={{ mt: 0.75, fontSize: 12, color: '#6b7280', overflowWrap: 'anywhere' }}>Pré-requisito: {nomesPorId.get(treinamento.preRequisitoId)}</Typography>}
+              {treinamento.grupos.length > 0 && <Typography sx={{ mt: 0.75, fontSize: 12, color: '#6b7280', overflowWrap: 'anywhere' }}>Grupos: {treinamento.grupos.map((grupo) => grupo.nome).join(', ')}</Typography>}
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <EtiquetaStatus label={treinamento.ativo ? 'Ativo' : 'Inativo'} tipo={treinamento.ativo ? 'success' : 'neutral'} />
