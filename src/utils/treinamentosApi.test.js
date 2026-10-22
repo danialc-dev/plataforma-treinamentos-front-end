@@ -10,8 +10,13 @@ const daApi = {
 test('converte o treinamento da API para o formato da tela', () => {
   assert.deepEqual(treinamentoDaApi(daApi), {
     id: 7, nome: 'Uso de EPI', descricao: 'Como usar.', tipo: 'online', videoUrl: 'https://youtu.be/M7lc1UVf-VE',
-    obrigatorio: true, prazoDias: 15, ativo: true, preRequisitoId: 3,
+    obrigatorio: true, prazoDias: 15, ativo: true, preRequisitoId: 3, grupos: [], grupoIds: [],
   });
+});
+test('converte os grupos do treinamento para nome e ids', () => {
+  const convertido = treinamentoDaApi({ ...daApi, grupos: [{ id: 7001, nome: 'Produção', idEmpresa: 1001 }, { id: 7002, nome: 'Manutenção', idEmpresa: 1001 }] });
+  assert.deepEqual(convertido.grupos, [{ id: 7001, nome: 'Produção' }, { id: 7002, nome: 'Manutenção' }]);
+  assert.deepEqual(convertido.grupoIds, [7001, 7002]);
 });
 test('campos opcionais ausentes viram vazio e categoria diferente de obrigatório vira não obrigatório', () => {
   const convertido = treinamentoDaApi({ ...daApi, descricao: null, videoUrlYoutube: null, categoria: 'não obrigatório', prerequisitos: [] });
@@ -20,6 +25,28 @@ test('campos opcionais ausentes viram vazio e categoria diferente de obrigatóri
   assert.equal(convertido.obrigatorio, false);
   assert.equal(convertido.preRequisitoId, null);
   assert.equal(treinamentoDaApi({ ...daApi, categoria: 'segurança', prerequisitos: undefined }).obrigatorio, false);
+});
+const base = { nome: 'N', descricao: 'D', tipo: 'online', videoUrl: 'https://youtu.be/M7lc1UVf-VE', obrigatorio: true, prazoDias: 10, preRequisitoId: null };
+
+test('ao criar, os grupos marcados vão em grupo_ids; sem nenhum, o campo some', () => {
+  assert.deepEqual(treinamentoParaApi({ ...base, grupoIds: [1, 2] }).grupo_ids, [1, 2]);
+  assert.equal('grupo_ids' in treinamentoParaApi({ ...base, grupoIds: [] }), false);
+});
+test('ao editar, só a diferença de grupos é enviada', () => {
+  const payload = treinamentoParaApi({ ...base, grupoIds: [2, 3] }, [1, 2]);
+  assert.deepEqual(payload.grupos_adicionados, [3]);
+  assert.deepEqual(payload.grupos_removidos, [1]);
+  assert.equal('grupo_ids' in payload, false);
+});
+test('ao editar sem mexer nos grupos, nenhum campo de grupo é enviado', () => {
+  const payload = treinamentoParaApi({ ...base, grupoIds: [1, 2] }, [1, 2]);
+  assert.equal('grupos_adicionados' in payload, false);
+  assert.equal('grupos_removidos' in payload, false);
+});
+test('sem grupoIds nos valores, os vínculos não são tocados nem ao editar', () => {
+  const payload = treinamentoParaApi(base, [1, 2]);
+  assert.equal('grupos_removidos' in payload, false);
+  assert.equal('grupo_ids' in payload, false);
 });
 test('converte os valores do formulário para o payload da API', () => {
   const valores = { nome: 'Novo', descricao: 'Texto', tipo: 'online', videoUrl: 'https://youtu.be/M7lc1UVf-VE', obrigatorio: false, prazoDias: 10, preRequisitoId: 2 };

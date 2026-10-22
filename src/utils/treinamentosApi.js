@@ -1,5 +1,6 @@
 // Tradução entre o formato da tela e o da API Laravel. Fica isolada aqui para as telas
 // não precisarem conhecer o contrato (nomes de campos, categoria como texto, etc.).
+import { calcularMudancaGrupos } from './grupos.js';
 import { extrairVideoId } from './youtube.js';
 
 const CATEGORIA_OBRIGATORIO = 'obrigatório';
@@ -20,11 +21,16 @@ export function treinamentoDaApi(dados) {
     prazoDias: dados.prazoDias,
     ativo: dados.ativo,
     preRequisitoId: dados.prerequisitos?.[0]?.id ?? null,
+    grupos: (dados.grupos ?? []).map((grupo) => ({ id: grupo.id, nome: grupo.nome })),
+    grupoIds: (dados.grupos ?? []).map((grupo) => grupo.id),
   };
 }
 
-export function treinamentoParaApi(valores) {
-  return {
+// Ao criar, "gruposAtuais" fica null e os grupos marcados vão em grupo_ids. Ao editar, recebe os grupos
+// que o treinamento já tinha e só a diferença é enviada (grupos_adicionados / grupos_removidos).
+// Sem "grupoIds" nos valores, os vínculos não são tocados.
+export function treinamentoParaApi(valores, gruposAtuais = null) {
+  const payload = {
     titulo: valores.nome,
     descricao: valores.descricao,
     tipo: valores.tipo,
@@ -33,6 +39,16 @@ export function treinamentoParaApi(valores) {
     prazo_dias: valores.prazoDias,
     prerequisito_id: valores.preRequisitoId ?? null,
   };
+  if (valores.grupoIds === undefined) return payload;
+
+  if (gruposAtuais === null) {
+    if (valores.grupoIds.length) payload.grupo_ids = valores.grupoIds;
+  } else {
+    const { adicionados, removidos } = calcularMudancaGrupos(gruposAtuais, valores.grupoIds);
+    if (adicionados.length) payload.grupos_adicionados = adicionados;
+    if (removidos.length) payload.grupos_removidos = removidos;
+  }
+  return payload;
 }
 
 // ---- Área do colaborador ---------------------------------------------------

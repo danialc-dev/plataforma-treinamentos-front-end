@@ -73,6 +73,7 @@ A rota autenticada `/admin/treinamentos` está ligada à API Laravel: lista, cri
 - **Tipo:** só *Online* pode ser escolhido. *Presencial — em breve* aparece desabilitado, porque terá regras próprias (endereço, presença). Treinamentos presenciais já existentes continuam sendo exibidos.
 - **Descrição:** opcional.
 - **Link do vídeo:** obrigatório para treinamentos online (o back-end também exige). Aceita links `youtube.com/watch`, `youtu.be`, `embed` e `shorts`.
+- **Grupos (opcional):** seção recolhível no fim do formulário, "Adicionar a grupos (opcional)", com um checkbox por grupo da empresa (`GET /grupos`, carregado ao abrir a seção), organizados em colunas (4 no computador, 3 no tablet e 2 no celular) para listas longas. Um treinamento pode ficar em zero, um ou vários grupos. Ao **criar**, os marcados vão em `grupo_ids`. Ao **editar**, os grupos atuais já vêm marcados e só a diferença é enviada (`grupos_adicionados` e `grupos_removidos`, calculada em `src/utils/grupos.js`); desmarcar remove só o vínculo, nunca o grupo. A lista mostra os grupos de cada treinamento. Ainda não existe a regra "cada pessoa só vê os grupos a que está vinculada".
 - **Categoria:** *Obrigatório* ou *Não obrigatório* (guardada em `categoria`).
 - **Prazo:** o texto de ajuda explica que é o tempo máximo, em dias, que a pessoa tem para concluir.
 - Não aparecem no formulário: presença mínima, duração do vídeo, ativo (o treinamento nasce ativo), empresa e criado por (vêm do servidor).
