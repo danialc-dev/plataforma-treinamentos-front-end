@@ -48,8 +48,8 @@ function ConteudoTreinamento({ treinamento }) {
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1.45fr) minmax(300px, 0.55fr)' }, gap: 2.5, alignItems: 'start' }}>
           <Box sx={{ ...containerCard, p: { xs: 2, sm: 3 } }}>
             <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#1f2937', mb: 1.5 }}>Conteúdo do treinamento</Typography>
-            <VideoTreinamento videoId={treinamento.videoId} onIniciar={() => iniciar(treinamento.id)} onTerminar={() => dispatch({ tipo: 'videoFinalizado', id: treinamento.id })} />
-            <Typography sx={{ fontSize: 12, color: '#6b7280', mt: 1.5 }}>Assista ao vídeo até o final para habilitar a confirmação de conclusão.</Typography>
+            <VideoTreinamento videoId={treinamento.videoId} bloquearAvanco={!concluido} onIniciar={() => iniciar(treinamento.id)} onTerminar={() => dispatch({ tipo: 'videoFinalizado', id: treinamento.id })} />
+            <Typography sx={{ fontSize: 12, color: '#6b7280', mt: 1.5 }}>Assista ao vídeo até o final, sem pular trechos, para habilitar a confirmação de conclusão.</Typography>
             {concluido ? (
               <Alert severity="success" sx={{ mt: 3 }}>Treinamento concluído em {formatarDataTreinamento(treinamento.concluidoEm)}. Você pode rever o vídeo quando quiser.</Alert>
             ) : (
