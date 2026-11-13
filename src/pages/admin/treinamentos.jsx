@@ -45,7 +45,12 @@ function Treinamentos() {
   useEffect(() => { carregar(); }, [carregar]);
 
   function notificar(mensagem, severidade = 'success') {
-    setNotificacao({ mensagem, severidade, id: crypto.randomUUID() });
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`;
+
+    setNotificacao({ mensagem, severidade, id });
   }
 
   async function salvarTreinamento(valores) {
